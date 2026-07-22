@@ -1,6 +1,6 @@
 [phases.setup]
 nixPkgs = [
-    "(php84.withExtensions (pe: pe.enabled ++ [ pe.openssl ]))",
+    "(php84.withExtensions (pe: pe.enabled ++ []))",
     "nginx",
     "libmysqlclient",
     "php84Packages.composer",
