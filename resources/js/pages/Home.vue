@@ -1,12 +1,13 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { Link, Head } from '@inertiajs/vue3'
+import { Icon } from '@iconify/vue'
 
-// --- MOCK DATA ---
+// --- STATE & DATA ---
 const currentCity = ref('Bengaluru')
 const cities = ['Bengaluru', 'Hyderabad', 'Chennai', 'Pune', 'Mumbai']
 
-const activeTab = ref('buy') // 'buy', 'invest', 'gated'
+const activeTab = ref('buy') // 'buy', 'gated', 'invest'
 
 const searchQuery = ref({
   locality: '',
@@ -14,20 +15,173 @@ const searchQuery = ref({
   maxBudget: ''
 })
 
-const plotCategories = [
-  { id: 'gated', name: 'Gated Communities', icon: '🏰', count: '1,240+' },
-  { id: 'dtcp', name: 'DTCP / RERA Approved', icon: '🛡️', count: '3,800+' },
-  { id: 'agricultural', name: 'Farmland & Agri', icon: '🌾', count: '950+' },
-  { id: 'commercial', name: 'Commercial Land', icon: '🏢', count: '620+' },
+// Horizontal Capsule Categories (Capsule-like Pills)
+const capsuleCategories = [
+  { id: 'all', name: 'All Plots', icon: 'lucide:layers' },
+  { id: 'residential', name: 'Residential Lands', icon: 'lucide:map-pin' },
+  { id: 'gated', name: 'Gated Communities', icon: 'lucide:shield-check' },
+  { id: 'commercial', name: 'Commercial Sites', icon: 'lucide:building-2' },
+  { id: 'farmland', name: 'Agricultural & Agri', icon: 'lucide:sprout' },
+  { id: 'corner', name: 'Corner Plots', icon: 'lucide:compass' },
+  { id: 'east', name: 'East Facing Vastu', icon: 'lucide:sun' },
+  { id: 'metro', name: 'Near Metro Corridor', icon: 'lucide:train' },
 ]
 
-const popularLocalities = [
-  { name: 'Devanahalli', city: 'Bengaluru', avgPrice: '₹3,200 / sq.ft', growth: '+14% YoY' },
-  { name: 'Sarjapur Road', city: 'Bengaluru', avgPrice: '₹4,500 / sq.ft', growth: '+18% YoY' },
-  { name: 'Yelahanka', city: 'Bengaluru', avgPrice: '₹5,100 / sq.ft', growth: '+12% YoY' },
-  { name: 'Hosur Road', city: 'Bengaluru', avgPrice: '₹2,800 / sq.ft', growth: '+15% YoY' },
+// Premium Projects Data for Exclusive Gated Communities
+const premiumProjects = ref([
+  {
+    id: 301,
+    title: 'Prestige Sanctuary Estates',
+    locality: 'Nandi Hills, Bengaluru',
+    price: '₹1.25 Cr+',
+    tag: 'Luxury Gated',
+    image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80'
+  },
+  {
+    id: 302,
+    title: 'Sobha Oakshire Reserve',
+    locality: 'Devanahalli, Bengaluru',
+    price: '₹85 L+',
+    tag: 'RERA & BIAPPA',
+    image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80'
+  },
+  {
+    id: 303,
+    title: 'Godrej Woodland Enclave',
+    locality: 'Sarjapur East, Bengaluru',
+    price: '₹95 L+',
+    tag: 'Clubhouse Included',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'
+  },
+  {
+    id: 304,
+    title: 'Purva Tranquillity Phase 2',
+    locality: 'S Medihalli, Bengaluru',
+    price: '₹68 L+',
+    tag: 'Eco-Living',
+    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'
+  }
+])
+
+// Portrait Cards: Hot Handpicked Plots (Horizontal Scroll)
+const portraitPlots = ref([
+  {
+    id: 201,
+    title: '30x40 East Facing Plot in Devanahalli',
+    locality: 'Devanahalli, Bengaluru',
+    price: '₹48.5 L',
+    pricePerSqFt: '₹4,041/sqft',
+    dimensions: '1,200 sq.ft',
+    tag: 'Hot Deal',
+    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80',
+    verified: true
+  },
+  {
+    id: 202,
+    title: '40x60 BMRDA Approved Corner Land',
+    locality: 'Sarjapur Road, Bengaluru',
+    price: '₹1.12 Cr',
+    pricePerSqFt: '₹4,666/sqft',
+    dimensions: '2,400 sq.ft',
+    tag: 'RERA Clear',
+    image: 'https://images.unsplash.com/photo-1628624747186-a941c476b7ef?auto=format&fit=crop&w=600&q=80',
+    verified: true
+  },
+  {
+    id: 203,
+    title: 'Premium Villa Plot near Airport Road',
+    locality: 'Yelahanka, Bengaluru',
+    price: '₹82.0 L',
+    pricePerSqFt: '₹5,466/sqft',
+    dimensions: '1,500 sq.ft',
+    tag: 'Gated Township',
+    image: 'https://images.unsplash.com/photo-1524813686514-a57563d77965?auto=format&fit=crop&w=600&q=80',
+    verified: true
+  },
+  {
+    id: 204,
+    title: '1/2 Acre Agri Farmland with Water Source',
+    locality: 'Doddaballapur, Bengaluru',
+    price: '₹65.0 L',
+    pricePerSqFt: '₹2,980/sqft',
+    dimensions: '21,780 sq.ft',
+    tag: 'Farm Plot',
+    image: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=600&q=80',
+    verified: false
+  }
+])
+
+// Bento Box Categories
+const bentoCategories = [
+  {
+    id: 'gated-bento',
+    title: 'Gated Townships',
+    subtitle: 'Security, Clubhouse & Parks',
+    count: '1,240+ Plots',
+    image: 'https://images.unsplash.com/photo-1628624747186-a941c476b7ef?auto=format&fit=crop&w=800&q=80',
+    span: 'col-span-1 sm:col-span-2 md:col-span-2 row-span-2',
+    accentColor: 'from-emerald-900/90 to-slate-900/80',
+    icon: 'lucide:shield-check'
+  },
+  {
+    id: 'rera-bento',
+    title: '100% RERA & Legal Verified',
+    subtitle: 'Clear Title Deeds',
+    count: '3,100+ Lands',
+    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80',
+    span: 'col-span-1 sm:col-span-1 md:col-span-1 row-span-1',
+    accentColor: 'from-teal-900/85 to-slate-900/80',
+    icon: 'lucide:check-circle-2'
+  },
+  {
+    id: 'commercial-bento',
+    title: 'Commercial Plots',
+    subtitle: 'High ROI Main Road Sites',
+    count: '620+ Locations',
+    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80',
+    span: 'col-span-1 sm:col-span-1 md:col-span-1 row-span-1',
+    accentColor: 'from-blue-900/85 to-slate-900/80',
+    icon: 'lucide:building-2'
+  },
+  {
+    id: 'farmland-bento',
+    title: 'Managed Farmlands',
+    subtitle: 'Weekend Getaways & Eco Farming',
+    count: '950+ Acres',
+    image: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80',
+    span: 'col-span-1 sm:col-span-2 md:col-span-3 row-span-1',
+    accentColor: 'from-slate-950/80 to-emerald-950/85',
+    icon: 'lucide:sprout'
+  }
 ]
 
+// Horizontal Cards: New Layout Launches
+const newLaunches = ref([
+  {
+    id: 101,
+    name: 'Sobha Oakshire Layout',
+    developer: 'Sobha Developers',
+    locality: 'Devanahalli, Bengaluru',
+    priceStarting: '₹65 Lakhs',
+    totalUnits: '120 Plots',
+    approval: 'BIAPPA / RERA',
+    tag: 'New Launch',
+    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80'
+  },
+  {
+    id: 102,
+    name: 'Godrej Reserve Phase 2',
+    developer: 'Godrej Properties',
+    locality: 'Yelahanka Extension',
+    priceStarting: '₹88 Lakhs',
+    totalUnits: '85 Plots',
+    approval: 'BMRDA Approved',
+    tag: 'Pre-Launch Offer',
+    image: 'https://images.unsplash.com/photo-1628624747186-a941c476b7ef?auto=format&fit=crop&w=800&q=80'
+  }
+])
+
+// Featured Verified Plot Listings
 const featuredPlots = ref([
   {
     id: 1,
@@ -42,8 +196,7 @@ const featuredPlots = ref([
     approvals: ['BIAPPA', 'RERA Registered'],
     image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80',
     sellerType: 'Direct Owner',
-    isVerified: true,
-    isFeatured: true
+    isVerified: true
   },
   {
     id: 2,
@@ -58,8 +211,7 @@ const featuredPlots = ref([
     approvals: ['BMRDA Approved', 'E-Katha'],
     image: 'https://images.unsplash.com/photo-1628624747186-a941c476b7ef?auto=format&fit=crop&w=800&q=80',
     sellerType: 'Verified Builder',
-    isVerified: true,
-    isFeatured: true
+    isVerified: true
   },
   {
     id: 3,
@@ -74,13 +226,18 @@ const featuredPlots = ref([
     approvals: ['RERA Approved'],
     image: 'https://images.unsplash.com/photo-1524813686514-a57563d77965?auto=format&fit=crop&w=800&q=80',
     sellerType: 'Direct Owner',
-    isVerified: true,
-    isFeatured: false
+    isVerified: true
   }
 ])
 
+const popularLocalities = [
+  { name: 'Devanahalli', city: 'Bengaluru', avgPrice: '₹3,200 / sq.ft', growth: '+14% YoY' },
+  { name: 'Sarjapur Road', city: 'Bengaluru', avgPrice: '₹4,500 / sq.ft', growth: '+18% YoY' },
+  { name: 'Yelahanka', city: 'Bengaluru', avgPrice: '₹5,100 / sq.ft', growth: '+12% YoY' },
+  { name: 'Hosur Road', city: 'Bengaluru', avgPrice: '₹2,800 / sq.ft', growth: '+15% YoY' },
+]
+
 const handleSearch = () => {
-  // Submit search via Inertia router
   console.log('Searching plots:', { city: currentCity.value, ...searchQuery.value })
 }
 </script>
@@ -90,7 +247,7 @@ const handleSearch = () => {
 
   <div class="min-h-screen bg-slate-50 text-slate-800 pb-20 md:pb-10 font-sans">
     
-    <!-- TOP HEADER / NAVBAR -->
+    <!-- 1. TOP NAVBAR -->
     <header class="sticky top-0 z-40 bg-white shadow-sm border-b border-slate-100">
       <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-2">
         
@@ -107,7 +264,7 @@ const handleSearch = () => {
 
         <!-- Location Selector -->
         <div class="flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-full text-xs font-semibold text-slate-700 hover:bg-slate-200 cursor-pointer transition">
-          <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <Icon icon="lucide:map-pin" class="w-3.5 h-3.5 text-emerald-600" />
           <select v-model="currentCity" class="bg-transparent focus:outline-none cursor-pointer pr-1">
             <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
           </select>
@@ -115,8 +272,10 @@ const handleSearch = () => {
 
         <!-- Desktop Navigation Actions -->
         <div class="hidden md:flex items-center gap-4">
-          <Link href="/post-plot" class="text-xs font-semibold px-4 py-2 text-emerald-700 bg-emerald-50 rounded-lg border border-emerald-200 hover:bg-emerald-100 transition">
-            + Post Plot <span class="bg-emerald-600 text-white text-[10px] px-1.5 py-0.5 rounded ml-1">FREE</span>
+          <Link href="/post-plot" class="text-xs font-semibold px-4 py-2 text-emerald-700 bg-emerald-50 rounded-lg border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5">
+            <Icon icon="lucide:plus-circle" class="w-4 h-4 text-emerald-600" />
+            <span>Post Plot</span>
+            <span class="bg-emerald-600 text-white text-[10px] px-1.5 py-0.5 rounded ml-0.5 font-bold">FREE</span>
           </Link>
           <Link href="/login" class="text-xs font-semibold px-4 py-2 text-slate-700 hover:text-emerald-600">
             Log In / Register
@@ -125,9 +284,8 @@ const handleSearch = () => {
       </div>
     </header>
 
-    <!-- HERO SECTION & SEARCH -->
+    <!-- 2. HERO SECTION WITH INTEGRATED SEARCH -->
     <section class="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white pt-8 pb-14 px-4 relative overflow-hidden">
-      <!-- Subtle background accent -->
       <div class="absolute -top-24 -right-24 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
       
       <div class="max-w-3xl mx-auto text-center relative z-10">
@@ -141,10 +299,9 @@ const handleSearch = () => {
           Explore DTCP, BMRDA & RERA approved residential & commercial land with clear titles.
         </p>
 
-        <!-- Search Card -->
+        <!-- Search Card Component -->
         <div class="bg-white rounded-2xl p-3 sm:p-4 text-slate-800 shadow-xl border border-slate-100 text-left">
-          
-          <!-- Quick Tabs -->
+          <!-- Quick Filter Tabs -->
           <div class="flex items-center gap-2 border-b border-slate-100 pb-3 mb-3">
             <button 
               @click="activeTab = 'buy'" 
@@ -166,7 +323,7 @@ const handleSearch = () => {
             </button>
           </div>
 
-          <!-- Input Fields -->
+          <!-- Input Fields Grid -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <div class="relative">
               <label class="text-[10px] uppercase tracking-wider font-bold text-slate-400 block mb-0.5">Locality / Landmark</label>
@@ -200,11 +357,11 @@ const handleSearch = () => {
             </div>
           </div>
 
-          <!-- Submit Search Button -->
+          <!-- Search CTA Button -->
           <button 
             @click="handleSearch"
             class="w-full mt-3 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-xs sm:text-sm py-3 rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <Icon icon="lucide:search" class="w-4 h-4 stroke-[2.5]" />
             Search Verified Plots
           </button>
         </div>
@@ -212,23 +369,258 @@ const handleSearch = () => {
       </div>
     </section>
 
-    <!-- QUICK CATEGORIES (HORIZONTAL SCROLL ON MOBILE) -->
-    <section class="max-w-7xl mx-auto px-4 -mt-6 relative z-20">
-      <div class="flex gap-3 overflow-x-auto no-scrollbar pb-2 pt-1">
-        <div 
-          v-for="cat in plotCategories" 
+    <!-- 3. CAPSULE-LIKE CURVED CATEGORY STRIP -->
+    <section class="max-w-7xl mx-auto px-4 -mt-5 relative z-20">
+      <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 pt-1 items-center">
+        <button 
+          v-for="cat in capsuleCategories" 
           :key="cat.id"
-          class="flex-shrink-0 bg-white border border-slate-200/80 rounded-xl p-3 min-w-[150px] shadow-sm hover:shadow-md transition cursor-pointer flex items-center gap-3">
-          <span class="text-2xl">{{ cat.icon }}</span>
-          <div>
-            <h4 class="text-xs font-bold text-slate-800 leading-snug">{{ cat.name }}</h4>
-            <span class="text-[10px] text-slate-400 font-medium">{{ cat.count }} plots</span>
+          class="flex-shrink-0 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-700 px-4 py-2 rounded-full shadow-sm text-xs font-bold transition-all flex items-center gap-2 group cursor-pointer">
+          <Icon :icon="cat.icon" class="w-4 h-4 text-emerald-600 group-hover:scale-110 transition" />
+          <span>{{ cat.name }}</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 4. PREMIUM PROJECTS (PORTRAIT SCROLLING CARDS) -->
+    <section class="max-w-7xl mx-auto px-4 mt-10">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-extrabold text-slate-900">Exclusive Gated Communities</h2>
+          <p class="text-xs text-slate-500">Premium lifestyle plotted developments</p>
+        </div>
+      </div>
+
+      <div class="flex gap-4 overflow-x-auto no-scrollbar pb-6 pt-2 snap-x">
+        <div 
+          v-for="project in premiumProjects" 
+          :key="project.id"
+          class="relative shrink-0 w-60 h-80 rounded-[2rem] overflow-hidden group cursor-pointer snap-start shadow-sm hover:shadow-xl transition-all duration-300">
+          
+          <img :src="project.image" :alt="project.title" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+          
+          <!-- Gradient Overlay -->
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent"></div>
+          
+          <!-- Tag -->
+          <div class="absolute top-4 left-4 bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-bold px-3 py-1 rounded-full">
+            {{ project.tag }}
+          </div>
+          
+          <!-- Details at Bottom -->
+          <div class="absolute bottom-4 left-4 right-4">
+            <h3 class="text-white font-bold text-base leading-tight mb-1">{{ project.title }}</h3>
+            <p class="text-slate-300 text-[11px] flex items-center gap-1 mb-2">
+              <Icon icon="lucide:map-pin" class="w-3 h-3 text-emerald-400" /> {{ project.locality }}
+            </p>
+            <div class="flex items-center justify-between">
+              <span class="text-emerald-400 font-extrabold text-lg">{{ project.price }}</span>
+              <div class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-emerald-500 transition">
+                <Icon icon="lucide:arrow-right" class="w-4 h-4" />
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- FEATURED PLOTS LISTINGS -->
+    <!-- 5. PORTRAIT CARDS IN A HORIZONTAL SCROLL -->
+    <section class="max-w-7xl mx-auto px-4 mt-8">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+            <span>🔥 Fast Selling Plots</span>
+            <span class="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">High Demand</span>
+          </h2>
+          <p class="text-xs text-slate-500">Handpicked vertical plot cards available for immediate possession</p>
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="text-xs font-semibold text-slate-400">Scroll</span>
+          <Icon icon="lucide:arrow-right" class="w-4 h-4 text-slate-400" />
+        </div>
+      </div>
+
+      <!-- Horizontal Scrollable Container for Portrait Cards -->
+      <div class="flex gap-4 overflow-x-auto no-scrollbar pb-4 pt-1 snap-x snap-mandatory">
+        <div 
+          v-for="item in portraitPlots" 
+          :key="item.id"
+          class="flex-shrink-0 w-60 sm:w-64 bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 snap-start flex flex-col group cursor-pointer">
+          
+          <!-- Portrait Image Frame -->
+          <div class="relative h-64 w-full bg-slate-100 overflow-hidden shrink-0">
+            <img :src="item.image" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+            
+            <span class="absolute top-3 left-3 bg-emerald-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded shadow">
+              {{ item.tag }}
+            </span>
+
+            <button class="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-slate-700 hover:text-red-500 transition">
+              <Icon icon="lucide:heart" class="w-3.5 h-3.5" />
+            </button>
+
+            <!-- Portrait Bottom Overlay Info -->
+            <div class="absolute bottom-3 left-3 right-3 text-white">
+              <div class="flex items-baseline justify-between mb-0.5">
+                <span class="text-lg font-black leading-none">{{ item.price }}</span>
+                <span class="text-[10px] text-emerald-300 font-semibold">{{ item.pricePerSqFt }}</span>
+              </div>
+              <p class="text-[11px] text-slate-300 font-medium truncate">{{ item.dimensions }}</p>
+            </div>
+          </div>
+
+          <!-- Portrait Content Bottom Card -->
+          <div class="p-3 flex-1 flex flex-col justify-between bg-white">
+            <div>
+              <h3 class="text-xs font-bold text-slate-800 line-clamp-2 leading-snug mb-1.5 group-hover:text-emerald-600 transition">
+                {{ item.title }}
+              </h3>
+              <p class="text-[11px] text-slate-500 flex items-center gap-1">
+                <Icon icon="lucide:map-pin" class="w-3 h-3 text-emerald-600 shrink-0" />
+                <span class="truncate">{{ item.locality }}</span>
+              </p>
+            </div>
+
+            <button class="mt-3 w-full bg-slate-900 group-hover:bg-emerald-600 text-white text-[11px] font-bold py-2 rounded-xl transition flex items-center justify-center gap-1">
+              <span>View Details</span>
+              <Icon icon="lucide:chevron-right" class="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. MIXED BENTO-BOX CATEGORY SECTION -->
+    <section class="max-w-7xl mx-auto px-4 mt-8">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-extrabold text-slate-900">Explore Plot Collections</h2>
+          <p class="text-xs text-slate-500">Discover land opportunities structured by investment intent</p>
+        </div>
+      </div>
+
+      <!-- Bento Grid Box -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 gap-3 auto-rows-[160px]">
+        <div 
+          v-for="bento in bentoCategories" 
+          :key="bento.id"
+          :class="[bento.span]"
+          class="relative rounded-2xl overflow-hidden group cursor-pointer border border-slate-200/80 shadow-sm hover:shadow-lg transition">
+          
+          <!-- Background Image & Gradient -->
+          <img :src="bento.image" :alt="bento.title" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700" />
+          <div :class="['absolute inset-0 bg-gradient-to-t', bento.accentColor]"></div>
+
+          <!-- Content Overlay -->
+          <div class="absolute inset-0 p-4 sm:p-5 flex flex-col justify-between text-white z-10">
+            <div class="flex items-center justify-between">
+              <span class="bg-white/20 backdrop-blur-md text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1.5 border border-white/20">
+                <Icon :icon="bento.icon" class="w-3.5 h-3.5 text-emerald-300" />
+                {{ bento.count }}
+              </span>
+              <div class="w-7 h-7 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center group-hover:bg-white group-hover:text-slate-900 transition">
+                <Icon icon="lucide:arrow-up-right" class="w-4 h-4" />
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-base sm:text-xl font-black leading-tight mb-1">{{ bento.title }}</h3>
+              <p class="text-xs text-slate-300 font-medium line-clamp-1">{{ bento.subtitle }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. PROMOTIONAL / SELLER CTA BANNER CARD -->
+    <section class="max-w-7xl mx-auto px-4 mt-8">
+      <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white rounded-2xl p-4 sm:p-6 shadow-md relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
+          <Icon icon="lucide:building-2" class="w-64 h-64 text-white" />
+        </div>
+
+        <div class="relative z-10 text-center sm:text-left">
+          <div class="inline-flex items-center gap-1 bg-white/20 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full mb-2 backdrop-blur-sm">
+            <Icon icon="lucide:sparkles" class="w-3 h-3 text-yellow-300" />
+            <span>LIMITED TIME PROMO</span>
+          </div>
+          <h3 class="text-base sm:text-xl font-extrabold leading-snug">
+            Are You a Land Owner or Developer?
+          </h3>
+          <p class="text-xs text-emerald-100 mt-1 max-w-lg">
+            Post your plot for <strong>100% Free</strong>. Get genuine buyer enquiries directly on WhatsApp with verified title checks.
+          </p>
+        </div>
+
+        <div class="relative z-10 shrink-0 w-full sm:w-auto">
+          <Link 
+            href="/post-plot" 
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-emerald-800 hover:bg-slate-100 font-extrabold text-xs px-5 py-3 rounded-xl shadow-md transition text-center">
+            <Icon icon="lucide:plus-circle" class="w-4 h-4 text-emerald-600" />
+            Post Property for Free
+          </Link>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. HORIZONTAL CARDS SECTION: NEW LAYOUT LAUNCHES -->
+    <section class="max-w-7xl mx-auto px-4 mt-8">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-extrabold text-slate-900">New Layout Launches</h2>
+          <p class="text-xs text-slate-500">Newly approved plotted developments in {{ currentCity }}</p>
+        </div>
+        <Link href="/new-launches" class="text-xs font-bold text-emerald-600 hover:underline">View All &rarr;</Link>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div 
+          v-for="launch in newLaunches" 
+          :key="launch.id"
+          class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col sm:flex-row">
+          
+          <div class="relative sm:w-2/5 h-40 sm:h-auto bg-slate-100 shrink-0">
+            <img :src="launch.image" :alt="launch.name" class="w-full h-full object-cover" />
+            <span class="absolute top-2 left-2 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">
+              {{ launch.tag }}
+            </span>
+          </div>
+
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">{{ launch.developer }}</span>
+              <h3 class="text-sm font-bold text-slate-900 mb-1">{{ launch.name }}</h3>
+              <p class="text-xs text-slate-500 flex items-center gap-1 mb-2">
+                <Icon icon="lucide:map-pin" class="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                {{ launch.locality }}
+              </p>
+
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                  {{ launch.approval }}
+                </span>
+                <span class="text-xs text-slate-500">{{ launch.totalUnits }}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+              <div>
+                <span class="text-[10px] text-slate-400 block">Starting From</span>
+                <span class="text-sm font-black text-slate-900">{{ launch.priceStarting }}</span>
+              </div>
+              <button class="text-xs font-bold px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition">
+                Enquire Now
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. VERTICAL CARDS SECTION: HANDPICKED FEATURED PLOTS -->
     <section class="max-w-7xl mx-auto px-4 mt-8">
       <div class="flex items-center justify-between mb-4">
         <div>
@@ -238,14 +630,12 @@ const handleSearch = () => {
         <Link href="/plots" class="text-xs font-bold text-emerald-600 hover:underline">View All &rarr;</Link>
       </div>
 
-      <!-- Plot Cards Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div 
           v-for="plot in featuredPlots" 
           :key="plot.id"
           class="bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col group">
           
-          <!-- Image Section -->
           <div class="relative h-48 bg-slate-100 overflow-hidden">
             <img 
               :src="plot.image" 
@@ -253,8 +643,8 @@ const handleSearch = () => {
               class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
             />
             <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
-              <span v-if="plot.isVerified" class="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow">
-                ✓ Verified Title
+              <span v-if="plot.isVerified" class="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow flex items-center gap-1">
+                <Icon icon="lucide:check-circle" class="w-3 h-3" /> Title Verified
               </span>
               <span class="bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-medium px-2 py-0.5 rounded-md">
                 {{ plot.sellerType }}
@@ -262,7 +652,7 @@ const handleSearch = () => {
             </div>
             
             <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-slate-600 hover:text-red-500 shadow">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+              <Icon icon="lucide:heart" class="w-4 h-4" />
             </button>
 
             <div class="absolute bottom-2 left-3 right-3 flex items-center justify-between text-white text-[11px] font-semibold bg-slate-900/60 backdrop-blur-md px-2.5 py-1 rounded-lg">
@@ -274,7 +664,6 @@ const handleSearch = () => {
             </div>
           </div>
 
-          <!-- Plot Details -->
           <div class="p-4 flex-1 flex flex-col justify-between">
             <div>
               <div class="flex items-baseline justify-between mb-1">
@@ -284,11 +673,10 @@ const handleSearch = () => {
               
               <h3 class="text-sm font-bold text-slate-800 line-clamp-1 mb-1">{{ plot.title }}</h3>
               <p class="text-xs text-slate-500 flex items-center gap-1 mb-3">
-                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                <Icon icon="lucide:map-pin" class="w-3.5 h-3.5 text-slate-400 shrink-0" />
                 {{ plot.locality }}
               </p>
 
-              <!-- Approval Tags -->
               <div class="flex flex-wrap gap-1 mb-4">
                 <span 
                   v-for="approval in plot.approvals" 
@@ -299,13 +687,14 @@ const handleSearch = () => {
               </div>
             </div>
 
-            <!-- CTA Buttons -->
             <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-              <button class="w-full text-xs font-bold py-2 px-3 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition text-center">
-                Get Layout Plan
+              <button class="w-full text-xs font-bold py-2 px-3 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition text-center flex items-center justify-center gap-1">
+                <Icon icon="lucide:file-text" class="w-3.5 h-3.5 text-slate-500" />
+                Layout Plan
               </button>
-              <button class="w-full text-xs font-bold py-2 px-3 text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm transition text-center">
-                Contact Owner
+              <button class="w-full text-xs font-bold py-2 px-3 text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm transition text-center flex items-center justify-center gap-1">
+                <Icon icon="lucide:phone-call" class="w-3.5 h-3.5" />
+                Contact
               </button>
             </div>
           </div>
@@ -314,7 +703,7 @@ const handleSearch = () => {
       </div>
     </section>
 
-    <!-- HIGH INVESTMENT LOCALITIES -->
+    <!-- 10. METRIC CARDS: HIGH INVESTMENT LOCALITIES -->
     <section class="max-w-7xl mx-auto px-4 mt-10">
       <div class="bg-gradient-to-r from-emerald-900 to-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-md">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
@@ -322,8 +711,9 @@ const handleSearch = () => {
             <h2 class="text-base sm:text-lg font-bold">Trending High-Growth Plot Corridors</h2>
             <p class="text-xs text-slate-300">Based on land appreciation data in {{ currentCity }}</p>
           </div>
-          <span class="text-[11px] bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/30 font-semibold w-max">
-            🔥 Up to 18% Annual Appreciation
+          <span class="text-[11px] bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/30 font-semibold w-max flex items-center gap-1">
+            <Icon icon="lucide:trending-up" class="w-3.5 h-3.5 text-emerald-400" />
+            Up to 18% Annual Appreciation
           </span>
         </div>
 
@@ -340,53 +730,59 @@ const handleSearch = () => {
       </div>
     </section>
 
-    <!-- WHY INFINITY PLOTS (TRUST FACTORS) -->
+    <!-- 11. VALUE PROP / TRUST FEATURE CARDS -->
     <section class="max-w-7xl mx-auto px-4 mt-10 mb-8">
       <h2 class="text-center text-lg font-extrabold text-slate-900 mb-6">Why Plot Buyers Choose Infinity Plots</h2>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-white p-4 rounded-2xl border border-slate-200/80 text-center">
-          <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-2 text-lg font-bold">📄</div>
+          <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-2 text-lg font-bold">
+            <Icon icon="lucide:shield-check" class="w-5 h-5" />
+          </div>
           <h3 class="text-xs font-bold text-slate-800 mb-1">Encumbrance & Title Check</h3>
           <p class="text-[11px] text-slate-500">Every listed plot undergoes legal document verification before going live.</p>
         </div>
 
         <div class="bg-white p-4 rounded-2xl border border-slate-200/80 text-center">
-          <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-2 text-lg font-bold">📐</div>
+          <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-2 text-lg font-bold">
+            <Icon icon="lucide:ruler" class="w-5 h-5" />
+          </div>
           <h3 class="text-xs font-bold text-slate-800 mb-1">Exact Plot Maps & Facing</h3>
           <p class="text-[11px] text-slate-500">Get boundary markings, street width, and exact plot dimensions transparently.</p>
         </div>
 
         <div class="bg-white p-4 rounded-2xl border border-slate-200/80 text-center">
-          <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-2 text-lg font-bold">🤝</div>
+          <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-2 text-lg font-bold">
+            <Icon icon="lucide:handshake" class="w-5 h-5" />
+          </div>
           <h3 class="text-xs font-bold text-slate-800 mb-1">Direct Owner Communication</h3>
           <p class="text-[11px] text-slate-500">Zero middleman commission. Connect directly with owners and layout developers.</p>
         </div>
       </div>
     </section>
 
-    <!-- MOBILE BOTTOM FIXED NAV BAR -->
+    <!-- 12. MOBILE BOTTOM NAVIGATION BAR -->
     <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-2 flex items-center justify-between z-50 shadow-lg">
       <Link href="/" class="flex flex-col items-center gap-0.5 text-emerald-600">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <Icon icon="lucide:home" class="w-5 h-5" />
         <span class="text-[10px] font-bold">Home</span>
       </Link>
-      <Link href="/plots" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <span class="text-[10px] font-semibold">Explore</span>
+      <Link href="/search" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700">
+        <Icon icon="lucide:search" class="w-5 h-5" />
+        <span class="text-[10px] font-semibold">Search</span>
       </Link>
       <Link href="/post-plot" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700">
         <div class="w-7 h-7 bg-emerald-600 text-white rounded-full flex items-center justify-center font-bold text-sm -mt-3 shadow-md">
-          +
+          <Icon icon="lucide:plus" class="w-4 h-4" />
         </div>
         <span class="text-[10px] font-semibold">Sell Plot</span>
       </Link>
       <Link href="/shortlists" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        <Icon icon="lucide:heart" class="w-5 h-5" />
         <span class="text-[10px] font-semibold">Saved</span>
       </Link>
-      <Link href="/login" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-        <span class="text-[10px] font-semibold">Account</span>
+      <Link href="/menu" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700">
+        <Icon icon="lucide:menu" class="w-5 h-5" />
+        <span class="text-[10px] font-semibold">Menu</span>
       </Link>
     </div>
 
@@ -394,7 +790,6 @@ const handleSearch = () => {
 </template>
 
 <style scoped>
-/* Utility to hide scrollbars for horizontal category scroll */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
