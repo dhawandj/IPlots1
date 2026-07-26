@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref, } from 'vue'
 import { Link, Head } from '@inertiajs/vue3'
 import { Icon } from '@iconify/vue'
 
@@ -240,6 +240,48 @@ const popularLocalities = [
 const handleSearch = () => {
   console.log('Searching plots:', { city: currentCity.value, ...searchQuery.value })
 }
+
+
+// app install code
+
+const deferredPrompt = ref(null)
+const canInstall = ref(false)
+
+const installApp = async () => {
+    if (!deferredPrompt.value) return
+
+    deferredPrompt.value.prompt()
+
+    const { outcome } = await deferredPrompt.value.userChoice
+
+    if (outcome === 'accepted') {
+        canInstall.value = false
+    }
+
+    deferredPrompt.value = null
+}
+
+onMounted(() => {
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault()
+
+        deferredPrompt.value = e
+        canInstall.value = true
+    })
+
+    window.addEventListener('appinstalled', () => {
+        canInstall.value = false
+        deferredPrompt.value = null
+    })
+
+    if (
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone
+    ) {
+        canInstall.value = false
+    }
+})
 </script>
 
 <template>
@@ -363,6 +405,18 @@ const handleSearch = () => {
             class="w-full mt-3 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-xs sm:text-sm py-3 rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition">
             <Icon icon="lucide:search" class="w-4 h-4 stroke-[2.5]" />
             Search Verified Plots
+          </button>
+
+          <button
+              v-if="canInstall"
+              @click="installApp"
+              class="w-full mt-3 inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 py-3 font-bold text-emerald-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-50 hover:shadow-md active:scale-[0.98]"
+          >
+              <div class="flex items-center gap-1.5 rounded-lg border border-emerald-100 bg-emerald-50 px-2 py-1">
+                  <Icon icon="logos:google-play-icon" class="w-4 h-4" />
+                  <Icon icon="logos:apple" class="w-4 h-4" />
+              </div>
+              <span class="text-sm sm:text-base">Install Infinity Plots App</span>
           </button>
         </div>
 

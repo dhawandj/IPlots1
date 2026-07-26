@@ -349,9 +349,9 @@ const resetFilters = () => {
                   <span>Call</span>
                 </button>
 
-                <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center group-hover:bg-emerald-400 group-hover:scale-105 transition shadow-lg">
+                <Link href="/plots/1" class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center group-hover:bg-emerald-400 group-hover:scale-105 transition shadow-lg">
                   <Icon icon="lucide:arrow-right" class="w-5 h-5" />
-                </div>
+                </Link>
               </div>
             </div>
 
